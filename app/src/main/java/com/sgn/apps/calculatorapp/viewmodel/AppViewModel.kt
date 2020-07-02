@@ -1,12 +1,13 @@
-package com.sgn.apps.calculatorapp
+package com.sgn.apps.calculatorapp.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.sgn.apps.calculatorapp.utils.OperationsEnum
 
 class AppViewModel : ViewModel() {
     private var lastResult: Int = 0
     private var isOperationButtonSelected: Boolean = false
     private var isEditTextEmpty: Boolean = true
-    private lateinit var operationType: Operations
+    private lateinit var operationType: OperationsEnum
 
     fun getLastResult(): Int {
         return lastResult
@@ -34,11 +35,11 @@ class AppViewModel : ViewModel() {
 
     }
 
-    fun getOperationType(): Operations {
+    fun getOperationType(): OperationsEnum {
         return operationType
     }
 
-    fun setOperationType(operationType: Operations) {
+    fun setOperationType(operationType: OperationsEnum) {
         this.operationType = operationType
 
     }

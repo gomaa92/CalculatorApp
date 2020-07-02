@@ -1,67 +1,96 @@
-package com.sgn.apps.calculatorapp
+package com.sgn.apps.calculatorapp.activity
 
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.jakewharton.rxbinding3.widget.textChanges
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Consumer
-import io.reactivex.functions.Function
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.sgn.apps.calculatorapp.*
+import com.sgn.apps.calculatorapp.adapter.HistoryAdapter
+import com.sgn.apps.calculatorapp.listener.ItemClickListener
+import com.sgn.apps.calculatorapp.model.RecyclerViewItem
+import com.sgn.apps.calculatorapp.utils.OperationsEnum
+import com.sgn.apps.calculatorapp.viewmodel.AppViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
-    /*    private var isOperationButtonSelected: Boolean = false
-        private var isEditTextEmpty: Boolean = true
-        private lateinit var operationType: Operations
-        private val lastResult: Int = 0*/
+class MainActivity : AppCompatActivity(),
+    ItemClickListener {
+
     private lateinit var mViewModel: AppViewModel
+    private lateinit var historyAdapter: HistoryAdapter
+    private lateinit var type: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mViewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
 
-        bindEditTextStatus()
+        initRecyclerView()
 
+        bindEditTextStatus()
         equalButtonClicked()
+
+    }
+
+    private fun initRecyclerView() {
+        operations_history_recycler_view.layoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        historyAdapter = HistoryAdapter(this)
+        operations_history_recycler_view.adapter = historyAdapter
 
     }
 
     private fun equalButtonClicked() {
         equal_btn.setOnClickListener {
-            if (mViewModel.getOperationType() == Operations.ADDITION) {
+            if (mViewModel.getOperationType() == OperationsEnum.ADDITION) {
+                type = OperationsEnum.ADDITION.type
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() +
                             (second_operand_edit_text.text.toString()).toInt()
                 )
 
 
-            } else if (mViewModel.getOperationType() == Operations.SUBTRACTION) {
+            } else if (mViewModel.getOperationType() == OperationsEnum.SUBTRACTION) {
+                type = OperationsEnum.SUBTRACTION.type
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() -
                             (second_operand_edit_text.text.toString()).toInt()
                 )
-            } else if (mViewModel.getOperationType() == Operations.MULTIPLICATION) {
+            } else if (mViewModel.getOperationType() == OperationsEnum.MULTIPLICATION) {
+                type = OperationsEnum.MULTIPLICATION.type
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() *
                             (second_operand_edit_text.text.toString()).toInt()
                 )
-            } else if (mViewModel.getOperationType() == Operations.DIVISION) {
+            } else if (mViewModel.getOperationType() == OperationsEnum.DIVISION) {
+                type = OperationsEnum.DIVISION.type
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() /
                             (second_operand_edit_text.text.toString()).toInt()
                 )
             }
-            result_value_text_view.setText(mViewModel.getLastResult().toString())
-            second_operand_edit_text.setText("")
+
+            //  result_value_text_view.setText(mViewModel.getLastResult().toString())
+            updateResult(mViewModel.getLastResult())
+            val historyItem = RecyclerViewItem(
+                second_operand_edit_text.text.toString(),
+                type
+            )
+            historyAdapter.addItem(historyItem)
+            historyAdapter.notifyDataSetChanged()
             handelEditText(false)
+            second_operand_edit_text.setText("")
+
+
         }
+
+    }
+
+    private fun updateResult(lastResult: Int) {
+        result_value_text_view.setText(lastResult.toString())
+
 
     }
 
@@ -103,25 +132,44 @@ class MainActivity : AppCompatActivity() {
     fun subtractionBtnClicked(view: View) {
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
-        mViewModel.setOperationType(Operations.SUBTRACTION)
+        mViewModel.setOperationType(OperationsEnum.SUBTRACTION)
     }
 
     fun additionBtnClicked(view: View) {
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
-        mViewModel.setOperationType(Operations.ADDITION)
+        mViewModel.setOperationType(OperationsEnum.ADDITION)
     }
 
     fun multiplicationBtnClicked(view: View) {
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
-        mViewModel.setOperationType(Operations.MULTIPLICATION)
+        mViewModel.setOperationType(OperationsEnum.MULTIPLICATION)
     }
 
     fun divisionBtnClicked(view: View) {
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
-        mViewModel.setOperationType(Operations.DIVISION)
+        mViewModel.setOperationType(OperationsEnum.DIVISION)
+    }
+
+    override fun onItemClick(item: RecyclerViewItem?, position: Int) {
+        historyAdapter.deleteItem(position)
+        if (item?.operationType.equals("+")) {
+            mViewModel.setLastResult(mViewModel.getLastResult() - item?.operationValue!!.toInt())
+
+        }
+        if (item?.operationType.equals("-")) {
+            mViewModel.setLastResult(mViewModel.getLastResult() + item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals("*")) {
+            mViewModel.setLastResult(mViewModel.getLastResult() / item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals("/")) {
+            mViewModel.setLastResult(mViewModel.getLastResult() * item?.operationValue!!.toInt())
+        }
+
+        updateResult(mViewModel.getLastResult())
     }
 
 
