@@ -5,8 +5,178 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/result_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/result_value_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/result_text_view"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/second_operand_edit_text_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/please_select_operation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/result_text_view">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/second_operand_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:inputType="numberDecimal"
+            android:textAlignment="viewStart" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TableRow
+        android:id="@+id/table_row_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/second_operand_edit_text_layout">
+
+        <Button
+            android:id="@+id/subtraction_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/sub"
+            android:onClick="subtractionBtnClicked"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+
+        <Button
+            android:id="@+id/addition_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/add"
+            android:onClick="additionBtnClicked"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/table_row_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/table_row_1">
+
+        <Button
+            android:id="@+id/multiplication_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:onClick="multiplicationBtnClicked"
+            android:text="@string/multi"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+
+        <Button
+            android:id="@+id/division_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/div"
+            android:onClick="divisionBtnClicked"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/table_row_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/table_row_2">
+
+        <Button
+            android:id="@+id/undo_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/undo"
+            android:enabled="false"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+
+        <Button
+            android:id="@+id/redo_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/redo"
+            android:textSize="20sp"
+            android:enabled="false"
+            style="@style/ButtonAppTheme.Button"
+            android:layout_margin="4dp" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/table_row_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/table_row_3"
+        app:layout_constraintTop_toBottomOf="@+id/table_row_3">
+
+        <Button
+            android:id="@+id/equal_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textSize="20sp"
+            style="@style/ButtonAppTheme.Button"
+            android:text="@string/equal"
+            android:enabled="false"
+            android:padding="16dp" />
+    </TableRow>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/operations_history"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toStartOf="@+id/table_row_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/table_row_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

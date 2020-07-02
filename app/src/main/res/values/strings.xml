@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CalculatorApp</string>
     <string name="please_enter_second_operand">Please enter the second operand </string>
+    <string name="please_select_operation">Please select operation first</string>
     <string name="result">Result =" "</string>
     <string name="add">+</string>
     <string name="sub">-</string>
