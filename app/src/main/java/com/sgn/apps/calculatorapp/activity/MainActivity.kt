@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mViewModel: AppViewModel
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var type: String
+    private var firstRedo: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,21 +113,24 @@ class MainActivity : AppCompatActivity(),
     //ctr+z
     private fun handelUndoButtonClicked() {
         undo_btn.setOnClickListener {
-            val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
-            getLastResult(item)
-            //  historyAdapter.deleteItem(historyAdapter.getLastIndex())
-            updateResult(mViewModel.getLastResult())
-            mViewModel.getRedoStack().push(item)
             redo_btn.isEnabled = true
+                val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
+                getLastResult(item)
+                //   historyAdapter.deleteItem(historyAdapter.getLastIndex())
+                updateResult(mViewModel.getLastResult())
+                mViewModel.getRedoStack().push(item)
 
             if (mViewModel.getUndoStack().size == 0) {
-                undo_btn.isEnabled = false
-            }
-        }
 
+                undo_btn.isEnabled = false
+
+            }
+
+        }
     }
 
     private fun updateResult(lastResult: Int) {
+
         result_value_text_view.setText(lastResult.toString())
     }
 
@@ -140,8 +144,7 @@ class MainActivity : AppCompatActivity(),
 
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 // Fires right before text is changing
-                mViewModel.setIsEditTextEmpty(second_operand_edit_text.text.toString().isEmpty())
-                handelEqualButton(mViewModel.getIsEditTextEmpty())
+
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -159,7 +162,7 @@ class MainActivity : AppCompatActivity(),
 
     private fun handelEditText(isOperationButtonSelected: Boolean) {
         if (isOperationButtonSelected) {
-            second_operand_edit_text_layout.setHint(getString(R.string.please_enter_second_operand))
+            second_operand_edit_text_layout.hint = getString(R.string.please_enter_second_operand)
         }
 
         second_operand_edit_text.isEnabled = isOperationButtonSelected
@@ -194,6 +197,12 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onItemClick(item: RecyclerViewItem?, position: Int) {
+        if (mViewModel.getUndoStack().size < 0) {
+            undo_btn.isEnabled = false
+        }
+        if (mViewModel.getRedoStack().size < 0) {
+            redo_btn.isEnabled = false
+        }
         historyAdapter.deleteItem(position)
         if (historyAdapter.getListSize() == 0) {
             undo_btn.isEnabled = false
