@@ -21,8 +21,6 @@ class MainActivity : AppCompatActivity(),
 
     private lateinit var mViewModel: AppViewModel
     private lateinit var historyAdapter: HistoryAdapter
-    private lateinit var type: String
-    private var firstRedo: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +42,11 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    // update last result after equal button pressed, clear edit text, clear selected button, add to history
     private fun equalButtonClicked() {
         equal_btn.setOnClickListener {
             if (mViewModel.getOperationType() == OperationsEnum.ADDITION) {
-                type = OperationsEnum.ADDITION.type
+                mViewModel.setType(OperationsEnum.ADDITION.type)
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() +
                             (second_operand_edit_text.text.toString()).toInt()
@@ -55,37 +54,35 @@ class MainActivity : AppCompatActivity(),
 
 
             } else if (mViewModel.getOperationType() == OperationsEnum.SUBTRACTION) {
-                type = OperationsEnum.SUBTRACTION.type
+                mViewModel.setType(OperationsEnum.SUBTRACTION.type)
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() -
                             (second_operand_edit_text.text.toString()).toInt()
                 )
             } else if (mViewModel.getOperationType() == OperationsEnum.MULTIPLICATION) {
-                type = OperationsEnum.MULTIPLICATION.type
+                mViewModel.setType(OperationsEnum.MULTIPLICATION.type)
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() *
                             (second_operand_edit_text.text.toString()).toInt()
                 )
             } else if (mViewModel.getOperationType() == OperationsEnum.DIVISION) {
-                type = OperationsEnum.DIVISION.type
+                mViewModel.setType(OperationsEnum.DIVISION.type)
                 mViewModel.setLastResult(
                     mViewModel.getLastResult() /
                             (second_operand_edit_text.text.toString()).toInt()
                 )
             }
 
-            //  result_value_text_view.setText(mViewModel.getLastResult().toString())
             updateResult(mViewModel.getLastResult())
             val historyItem = RecyclerViewItem(
                 second_operand_edit_text.text.toString(),
-                type
+                mViewModel.getType()
             )
             clearSelectedBtn()
             historyAdapter.addItem(historyItem)
             historyAdapter.notifyDataSetChanged()
             handelEditText(false)
             second_operand_edit_text.setText("")
-            //  mViewModel.getRedoStack().push(historyItem)
             mViewModel.getUndoStack().push(historyItem)
             undo_btn.isEnabled = true
 
@@ -94,7 +91,7 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    //ctr+y
+    //redo
     private fun handelRedoButtonClicked() {
         redo_btn.setOnClickListener {
             val item: RecyclerViewItem = mViewModel.getRedoStack().pop()
@@ -110,15 +107,15 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    //ctr+z
+    //undo
     private fun handelUndoButtonClicked() {
         undo_btn.setOnClickListener {
             redo_btn.isEnabled = true
-                val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
-                getLastResult(item)
-                //   historyAdapter.deleteItem(historyAdapter.getLastIndex())
-                updateResult(mViewModel.getLastResult())
-                mViewModel.getRedoStack().push(item)
+            val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
+            getLastResult(item)
+            //   historyAdapter.deleteItem(historyAdapter.getLastIndex())
+            updateResult(mViewModel.getLastResult())
+            mViewModel.getRedoStack().push(item)
 
             if (mViewModel.getUndoStack().size == 0) {
 
@@ -129,11 +126,13 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    // show last result
     private fun updateResult(lastResult: Int) {
 
-        result_value_text_view.setText(lastResult.toString())
+        result_value_text_view.text = lastResult.toString()
     }
 
+    // change edit text status according to user enter second operand or not
     private fun bindEditTextStatus() {
         second_operand_edit_text.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -156,10 +155,12 @@ class MainActivity : AppCompatActivity(),
         })
     }
 
+    // make equal button disable until user enter second operand
     private fun handelEqualButton(isEditTextEmpty: Boolean) {
         equal_btn.isEnabled = !isEditTextEmpty
     }
 
+    //handel edit text until user select operation
     private fun handelEditText(isOperationButtonSelected: Boolean) {
         if (isOperationButtonSelected) {
             second_operand_edit_text_layout.hint = getString(R.string.please_enter_second_operand)
@@ -196,6 +197,7 @@ class MainActivity : AppCompatActivity(),
         mViewModel.setOperationType(OperationsEnum.DIVISION)
     }
 
+    // delete item form recycler viwe after clicked
     override fun onItemClick(item: RecyclerViewItem?, position: Int) {
         if (mViewModel.getUndoStack().size < 0) {
             undo_btn.isEnabled = false
@@ -212,6 +214,8 @@ class MainActivity : AppCompatActivity(),
         updateResult(mViewModel.getLastResult())
     }
 
+
+    //calculate result after equal and undo buttons
     private fun getLastResult(item: RecyclerViewItem?) {
         if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() - item?.operationValue!!.toInt())
@@ -229,6 +233,8 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+
+    // calculate result after redo button clicked
     private fun getRedoResult(item: RecyclerViewItem?) {
         if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() + item?.operationValue!!.toInt())
@@ -246,6 +252,7 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+    //set border to selected button
     private fun setButtonPressed(button: Button) {
 
         when (button) {
@@ -280,6 +287,8 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+
+    // set default bg to button after equal button clicked
     private fun clearSelectedBtn() {
         subtraction_btn.setBackgroundResource(R.drawable.button_color)
         addition_btn.setBackgroundResource(R.drawable.button_color)

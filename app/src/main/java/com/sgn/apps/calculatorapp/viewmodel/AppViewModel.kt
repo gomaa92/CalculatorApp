@@ -15,7 +15,16 @@ class AppViewModel : ViewModel() {
     private var redoStack: Stack<RecyclerViewItem>
     private var undoStack: Stack<RecyclerViewItem>
     private var resultStack: Stack<RecyclerViewItem>
+    private var type: String = ""
 
+
+    fun getType(): String {
+        return type
+    }
+
+    fun setType(type: String) {
+        this.type = type
+    }
 
     init {
         resultStack = Stack()
@@ -23,7 +32,7 @@ class AppViewModel : ViewModel() {
         undoStack = Stack()
     }
 
-    fun getResultStack():Stack<RecyclerViewItem>{
+    fun getResultStack(): Stack<RecyclerViewItem> {
         return resultStack
     }
 
