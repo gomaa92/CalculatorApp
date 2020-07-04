@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -28,10 +29,10 @@ class MainActivity : AppCompatActivity(),
         mViewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
 
         initRecyclerView()
-
         bindEditTextStatus()
         equalButtonClicked()
-
+        handelUndoButtonClicked()
+        handelRedoButtonClicked()
     }
 
     private fun initRecyclerView() {
@@ -78,20 +79,55 @@ class MainActivity : AppCompatActivity(),
                 second_operand_edit_text.text.toString(),
                 type
             )
+            clearSelectedBtn()
             historyAdapter.addItem(historyItem)
             historyAdapter.notifyDataSetChanged()
             handelEditText(false)
             second_operand_edit_text.setText("")
+            //  mViewModel.getRedoStack().push(historyItem)
+            mViewModel.getUndoStack().push(historyItem)
+            undo_btn.isEnabled = true
 
 
         }
 
     }
 
+    //ctr+y
+    private fun handelRedoButtonClicked() {
+        redo_btn.setOnClickListener {
+            val item: RecyclerViewItem = mViewModel.getRedoStack().pop()
+            getRedoResult(item)
+            // historyAdapter.addItem(item)
+            mViewModel.getUndoStack().push(item)
+            updateResult(mViewModel.getLastResult())
+            if (!undo_btn.isEnabled)
+                undo_btn.isEnabled = true
+            if (mViewModel.getRedoStack().size == 0) {
+                redo_btn.isEnabled = false
+            }
+        }
+    }
+
+    //ctr+z
+    private fun handelUndoButtonClicked() {
+        undo_btn.setOnClickListener {
+            val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
+            getLastResult(item)
+            //  historyAdapter.deleteItem(historyAdapter.getLastIndex())
+            updateResult(mViewModel.getLastResult())
+            mViewModel.getRedoStack().push(item)
+            redo_btn.isEnabled = true
+
+            if (mViewModel.getUndoStack().size == 0) {
+                undo_btn.isEnabled = false
+            }
+        }
+
+    }
+
     private fun updateResult(lastResult: Int) {
         result_value_text_view.setText(lastResult.toString())
-
-
     }
 
     private fun bindEditTextStatus() {
@@ -130,24 +166,28 @@ class MainActivity : AppCompatActivity(),
     }
 
     fun subtractionBtnClicked(view: View) {
+        setButtonPressed(subtraction_btn)
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
         mViewModel.setOperationType(OperationsEnum.SUBTRACTION)
     }
 
     fun additionBtnClicked(view: View) {
+        setButtonPressed(addition_btn)
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
         mViewModel.setOperationType(OperationsEnum.ADDITION)
     }
 
     fun multiplicationBtnClicked(view: View) {
+        setButtonPressed(multiplication_btn)
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
         mViewModel.setOperationType(OperationsEnum.MULTIPLICATION)
     }
 
     fun divisionBtnClicked(view: View) {
+        setButtonPressed(division_btn)
         mViewModel.setOperationButtonSelected(true)
         handelEditText(mViewModel.getIsOperationButtonSelected())
         mViewModel.setOperationType(OperationsEnum.DIVISION)
@@ -155,21 +195,87 @@ class MainActivity : AppCompatActivity(),
 
     override fun onItemClick(item: RecyclerViewItem?, position: Int) {
         historyAdapter.deleteItem(position)
-        if (item?.operationType.equals("+")) {
+        if (historyAdapter.getListSize() == 0) {
+            undo_btn.isEnabled = false
+        }
+        getLastResult(item)
+
+        updateResult(mViewModel.getLastResult())
+    }
+
+    private fun getLastResult(item: RecyclerViewItem?) {
+        if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() - item?.operationValue!!.toInt())
 
         }
-        if (item?.operationType.equals("-")) {
+        if (item?.operationType.equals(OperationsEnum.SUBTRACTION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() + item?.operationValue!!.toInt())
         }
-        if (item?.operationType.equals("*")) {
+        if (item?.operationType.equals(OperationsEnum.MULTIPLICATION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() / item?.operationValue!!.toInt())
         }
-        if (item?.operationType.equals("/")) {
+        if (item?.operationType.equals(OperationsEnum.DIVISION.type)) {
             mViewModel.setLastResult(mViewModel.getLastResult() * item?.operationValue!!.toInt())
         }
 
-        updateResult(mViewModel.getLastResult())
+    }
+
+    private fun getRedoResult(item: RecyclerViewItem?) {
+        if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
+            mViewModel.setLastResult(mViewModel.getLastResult() + item?.operationValue!!.toInt())
+
+        }
+        if (item?.operationType.equals(OperationsEnum.SUBTRACTION.type)) {
+            mViewModel.setLastResult(mViewModel.getLastResult() - item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.MULTIPLICATION.type)) {
+            mViewModel.setLastResult(mViewModel.getLastResult() * item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.DIVISION.type)) {
+            mViewModel.setLastResult(mViewModel.getLastResult() / item?.operationValue!!.toInt())
+        }
+
+    }
+
+    private fun setButtonPressed(button: Button) {
+
+        when (button) {
+            subtraction_btn -> {
+                subtraction_btn.setBackgroundResource(R.drawable.selected_btn)
+                addition_btn.setBackgroundResource(R.drawable.button_color)
+                division_btn.setBackgroundResource(R.drawable.button_color)
+                multiplication_btn.setBackgroundResource(R.drawable.button_color)
+
+            }
+            addition_btn -> {
+                subtraction_btn.setBackgroundResource(R.drawable.button_color)
+                addition_btn.setBackgroundResource(R.drawable.selected_btn)
+                division_btn.setBackgroundResource(R.drawable.button_color)
+                multiplication_btn.setBackgroundResource(R.drawable.button_color)
+
+            }
+            division_btn -> {
+                subtraction_btn.setBackgroundResource(R.drawable.button_color)
+                addition_btn.setBackgroundResource(R.drawable.button_color)
+                division_btn.setBackgroundResource(R.drawable.selected_btn)
+                multiplication_btn.setBackgroundResource(R.drawable.button_color)
+
+            }
+            multiplication_btn -> {
+                subtraction_btn.setBackgroundResource(R.drawable.button_color)
+                addition_btn.setBackgroundResource(R.drawable.button_color)
+                division_btn.setBackgroundResource(R.drawable.button_color)
+                multiplication_btn.setBackgroundResource(R.drawable.selected_btn)
+
+            }
+        }
+    }
+
+    private fun clearSelectedBtn() {
+        subtraction_btn.setBackgroundResource(R.drawable.button_color)
+        addition_btn.setBackgroundResource(R.drawable.button_color)
+        division_btn.setBackgroundResource(R.drawable.button_color)
+        multiplication_btn.setBackgroundResource(R.drawable.button_color)
     }
 
 

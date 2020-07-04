@@ -27,9 +27,22 @@ class HistoryAdapter(mListener: ItemClickListener) :
 
 
     override fun getItemCount(): Int {
-        if (mData != null)
-            return this.mData.size
-        else return 0
+
+        return this.mData.size
+
+    }
+
+    fun getListSize(): Int {
+        return mData.size
+    }
+
+    fun getLastItem(): RecyclerViewItem {
+        return mData[mData.size - 1]
+    }
+
+    fun getLastIndex(): Int {
+        return mData.size - 1
+
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

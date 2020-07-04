@@ -5,4 +5,5 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="enabled_button">#ff962c</color>
     <color name="disable_button">#DCDCDC</color>
+    <color name="gray_acacac">#acacac</color>
 </resources>
