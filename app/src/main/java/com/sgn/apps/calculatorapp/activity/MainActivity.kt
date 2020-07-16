@@ -15,12 +15,15 @@ import com.sgn.apps.calculatorapp.model.RecyclerViewItem
 import com.sgn.apps.calculatorapp.utils.OperationsEnum
 import com.sgn.apps.calculatorapp.viewmodel.AppViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity(),
     ItemClickListener {
 
     private lateinit var mViewModel: AppViewModel
     private lateinit var historyAdapter: HistoryAdapter
+    private var firstRedo: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,7 @@ class MainActivity : AppCompatActivity(),
         equalButtonClicked()
         handelUndoButtonClicked()
         handelRedoButtonClicked()
+        //buttonsStatus()
     }
 
     private fun initRecyclerView() {
@@ -94,9 +98,10 @@ class MainActivity : AppCompatActivity(),
     //redo
     private fun handelRedoButtonClicked() {
         redo_btn.setOnClickListener {
+            firstRedo = true
             val item: RecyclerViewItem = mViewModel.getRedoStack().pop()
             getRedoResult(item)
-            // historyAdapter.addItem(item)
+           // historyAdapter.addItem(item)
             mViewModel.getUndoStack().push(item)
             updateResult(mViewModel.getLastResult())
             if (!undo_btn.isEnabled)
@@ -111,16 +116,16 @@ class MainActivity : AppCompatActivity(),
     private fun handelUndoButtonClicked() {
         undo_btn.setOnClickListener {
             redo_btn.isEnabled = true
+
             val item: RecyclerViewItem = mViewModel.getUndoStack().pop()
             getLastResult(item)
-            //   historyAdapter.deleteItem(historyAdapter.getLastIndex())
+           // historyAdapter.deleteItem(historyAdapter.getLastIndex())
             updateResult(mViewModel.getLastResult())
             mViewModel.getRedoStack().push(item)
 
+            mViewModel.getResultStack().push(item)
             if (mViewModel.getUndoStack().size == 0) {
-
                 undo_btn.isEnabled = false
-
             }
 
         }
@@ -199,6 +204,7 @@ class MainActivity : AppCompatActivity(),
 
     // delete item form recycler viwe after clicked
     override fun onItemClick(item: RecyclerViewItem?, position: Int) {
+
         if (mViewModel.getUndoStack().size < 0) {
             undo_btn.isEnabled = false
         }
@@ -208,10 +214,13 @@ class MainActivity : AppCompatActivity(),
         historyAdapter.deleteItem(position)
         if (historyAdapter.getListSize() == 0) {
             undo_btn.isEnabled = false
+
         }
         getLastResult(item)
 
         updateResult(mViewModel.getLastResult())
+        buttonsStatus()
+
     }
 
 
@@ -294,6 +303,16 @@ class MainActivity : AppCompatActivity(),
         addition_btn.setBackgroundResource(R.drawable.button_color)
         division_btn.setBackgroundResource(R.drawable.button_color)
         multiplication_btn.setBackgroundResource(R.drawable.button_color)
+    }
+
+    private fun buttonsStatus() {
+        if (historyAdapter.getListSize() <= 0) {
+            redo_btn.isEnabled = false
+            undo_btn.isEnabled = false
+            result_value_text_view.text = "0"
+            mViewModel.setRedoStack(Stack())
+            mViewModel.setUndoStack(Stack())
+        }
     }
 
 

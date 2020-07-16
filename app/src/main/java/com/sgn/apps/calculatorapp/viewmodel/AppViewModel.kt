@@ -14,7 +14,7 @@ class AppViewModel : ViewModel() {
     private lateinit var operationType: OperationsEnum
     private var redoStack: Stack<RecyclerViewItem>
     private var undoStack: Stack<RecyclerViewItem>
-    private var resultStack: Stack<RecyclerViewItem>
+    private var saveUndoStack: Stack<RecyclerViewItem> = Stack()
     private var type: String = ""
 
 
@@ -27,13 +27,12 @@ class AppViewModel : ViewModel() {
     }
 
     init {
-        resultStack = Stack()
         redoStack = Stack()
         undoStack = Stack()
     }
 
     fun getResultStack(): Stack<RecyclerViewItem> {
-        return resultStack
+        return saveUndoStack
     }
 
     fun getRedoStack(): Stack<RecyclerViewItem> {

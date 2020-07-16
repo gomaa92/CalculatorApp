@@ -11,8 +11,8 @@ import kotlinx.android.synthetic.main.item_history.view.*
 
 class HistoryAdapter(mListener: ItemClickListener) :
     RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
-    private lateinit var mData: ArrayList<RecyclerViewItem>
-    private lateinit var mListener: ItemClickListener
+    private  var mData: ArrayList<RecyclerViewItem>
+    private  var mListener: ItemClickListener
 
     init {
         this.mListener = mListener
