@@ -14,7 +14,6 @@ class AppViewModel : ViewModel() {
     private lateinit var operationType: OperationsEnum
     private var redoStack: Stack<RecyclerViewItem>
     private var undoStack: Stack<RecyclerViewItem>
-    private var saveUndoStack: Stack<RecyclerViewItem> = Stack()
     private var type: String = ""
 
 
@@ -22,8 +21,9 @@ class AppViewModel : ViewModel() {
         return type
     }
 
-    fun setType(type: String) {
+    fun setType(type: String): Boolean {
         this.type = type
+        return true
     }
 
     init {
@@ -31,24 +31,22 @@ class AppViewModel : ViewModel() {
         undoStack = Stack()
     }
 
-    fun getResultStack(): Stack<RecyclerViewItem> {
-        return saveUndoStack
-    }
-
     fun getRedoStack(): Stack<RecyclerViewItem> {
         return redoStack
     }
 
-    fun setRedoStack(stack: Stack<RecyclerViewItem>) {
+    fun setRedoStack(stack: Stack<RecyclerViewItem>): Boolean {
         this.redoStack = stack
+        return true
     }
 
     fun getUndoStack(): Stack<RecyclerViewItem> {
         return undoStack
     }
 
-    fun setUndoStack(stack: Stack<RecyclerViewItem>) {
+    fun setUndoStack(stack: Stack<RecyclerViewItem>): Boolean {
         this.undoStack = stack
+        return true
     }
 
     fun getLastResult(): Int {
@@ -63,7 +61,7 @@ class AppViewModel : ViewModel() {
         return isOperationButtonSelected
     }
 
-    fun setOperationButtonSelected(isOperationButtonSelected: Boolean) {
+     fun setOperationButtonSelected(isOperationButtonSelected: Boolean) {
         this.isOperationButtonSelected = isOperationButtonSelected
 
     }
@@ -81,8 +79,91 @@ class AppViewModel : ViewModel() {
         return operationType
     }
 
-    fun setOperationType(operationType: OperationsEnum) {
+    fun setOperationType(operationType: OperationsEnum): OperationsEnum {
         this.operationType = operationType
+        return operationType
+    }
 
+    fun addition(secondOperand: Int): Int {
+
+        setLastResult(getLastResult() + secondOperand)
+        return getLastResult()
+    }
+
+    fun subtraction(secondOperand: Int): Int {
+        setLastResult(getLastResult() - secondOperand)
+        return getLastResult()
+    }
+
+    fun multiplication(secondOperand: Int): Int {
+        setLastResult(getLastResult() * secondOperand)
+        return getLastResult()
+    }
+
+    fun division(secondOperand: Int): Int {
+        setLastResult(getLastResult() / secondOperand)
+        return getLastResult()
+    }
+
+    fun equalButton(historyItem: RecyclerViewItem): Int {
+        undoStack.push(historyItem)
+        return undoStack.size
+    }
+
+    fun calculateLastResult(item: RecyclerViewItem?): Int {
+
+        if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
+            setLastResult(getLastResult() - item?.operationValue!!.toInt())
+
+
+        }
+        if (item?.operationType.equals(OperationsEnum.SUBTRACTION.type)) {
+            setLastResult(getLastResult() + item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.MULTIPLICATION.type)) {
+            setLastResult(getLastResult() / item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.DIVISION.type)) {
+            setLastResult(getLastResult() * item?.operationValue!!.toInt())
+        }
+        return getLastResult()
+    }
+
+    fun getRedoResult(item: RecyclerViewItem?): Int {
+        if (item?.operationType.equals(OperationsEnum.ADDITION.type)) {
+            setLastResult(getLastResult() + item?.operationValue!!.toInt())
+
+        }
+        if (item?.operationType.equals(OperationsEnum.SUBTRACTION.type)) {
+            setLastResult(getLastResult() - item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.MULTIPLICATION.type)) {
+            setLastResult(getLastResult() * item?.operationValue!!.toInt())
+        }
+        if (item?.operationType.equals(OperationsEnum.DIVISION.type)) {
+            setLastResult(getLastResult() / item?.operationValue!!.toInt())
+        }
+        return getLastResult()
+
+    }
+
+    fun handleButtonClicked(operationsEnum: OperationsEnum): OperationsEnum {
+        setOperationButtonSelected(true)
+        setOperationType(operationsEnum)
+        return operationsEnum
+    }
+
+    fun undo(): Int {
+        val item = undoStack.pop()
+        calculateLastResult(item)
+        redoStack.push(item)
+        return undoStack.size
+    }
+
+    fun redo(): Int {
+        val item = redoStack.pop()
+        getRedoResult(item)
+        undoStack.push(item)
+        return redoStack.size
     }
 }
