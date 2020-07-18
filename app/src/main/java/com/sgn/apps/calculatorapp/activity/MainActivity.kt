@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity(),
 
 
     //set border to selected button
-    private fun setButtonPressed(button: Button): Button {
+    private fun setButtonPressed(button: Button) {
 
         when (button) {
             subtraction_btn -> {
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity(),
 
             }
         }
-        return button
+
 
     }
 

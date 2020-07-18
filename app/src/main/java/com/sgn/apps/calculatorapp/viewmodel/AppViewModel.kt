@@ -61,18 +61,17 @@ class AppViewModel : ViewModel() {
         return isOperationButtonSelected
     }
 
-     fun setOperationButtonSelected(isOperationButtonSelected: Boolean) {
+    fun setOperationButtonSelected(isOperationButtonSelected: Boolean) {
         this.isOperationButtonSelected = isOperationButtonSelected
-
     }
 
     fun getIsEditTextEmpty(): Boolean {
         return isEditTextEmpty
     }
 
-    fun setIsEditTextEmpty(isEditTextEmpty: Boolean) {
+    fun setIsEditTextEmpty(isEditTextEmpty: Boolean): Boolean {
         this.isEditTextEmpty = isEditTextEmpty
-
+        return isEditTextEmpty
     }
 
     fun getOperationType(): OperationsEnum {

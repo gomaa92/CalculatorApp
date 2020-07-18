@@ -11,7 +11,9 @@ import kotlinx.android.synthetic.main.item_history.view.*
 
 class HistoryAdapter(private var mListener: ItemClickListener) :
     RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
-    private  var mData: ArrayList<RecyclerViewItem> = ArrayList()
+
+
+    private var mData: ArrayList<RecyclerViewItem> = ArrayList()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

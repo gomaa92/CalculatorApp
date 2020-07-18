@@ -287,4 +287,25 @@ class AppViewModelUnitTest {
         val actual = appViewModel.getIsOperationButtonSelected()
         assertEquals(expected, actual)
     }
+    @Test
+    fun testGetIsEditTextEmpty() {
+        val expected=true
+        appViewModel.setIsEditTextEmpty(true)
+        val actual = appViewModel.getIsEditTextEmpty()
+        assertEquals(expected, actual)
+    }
+    @Test
+    fun testGetIsEditTextNotEmpty() {
+        val expected=false
+        appViewModel.setIsEditTextEmpty(false)
+        val actual = appViewModel.getIsEditTextEmpty()
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun testSetIsEditTextEmpty() {
+        val expected = true
+        val actual = appViewModel.setIsEditTextEmpty(true)
+        assertEquals(expected, actual)
+    }
 }
