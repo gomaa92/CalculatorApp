@@ -9,15 +9,9 @@ import com.sgn.apps.calculatorapp.R
 import com.sgn.apps.calculatorapp.model.RecyclerViewItem
 import kotlinx.android.synthetic.main.item_history.view.*
 
-class HistoryAdapter(mListener: ItemClickListener) :
+class HistoryAdapter(private var mListener: ItemClickListener) :
     RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
-    private  var mData: ArrayList<RecyclerViewItem>
-    private  var mListener: ItemClickListener
-
-    init {
-        this.mListener = mListener
-        mData = ArrayList()
-    }
+    private  var mData: ArrayList<RecyclerViewItem> = ArrayList()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,7 +40,7 @@ class HistoryAdapter(mListener: ItemClickListener) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = mData.get(position)
+        val item = mData[position]
         holder.onBind(item)
         holder.itemView.setOnClickListener {
             mListener.onItemClick(item, position)
